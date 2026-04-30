@@ -21,11 +21,11 @@ const initialProject: Project = {
 
 function App() {
   const [currentStep, setCurrentStep] = useState<Step>(1);
-  const [mode, setMode] = useState<AppMode>('workflow');
+  const [mode, setMode] = useState<AppMode>('csr-only');
   const { project, updateProject, resetProject } = useProjectStore(initialProject);
 
   const handleNewProject = () => {
-    if (confirm('Start a new keystore? This will clear all current data.')) {
+    if (confirm('Start a new project? This will clear all current data.')) {
       resetProject();
       setCurrentStep(1);
       setMode('workflow');
@@ -55,29 +55,29 @@ function App() {
     <div className="app">
       <header className="app-header">
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <h1>Keystore Builder</h1>
+          <h1>GoDaddy SSL Toolkit</h1>
           <button
             className="btn btn-secondary"
             onClick={handleNewProject}
             style={{ padding: '0.5rem 1rem', fontSize: '0.875rem' }}
           >
-            New Keystore
+            New Project
           </button>
         </div>
       </header>
 
       <div className="tabs">
         <button
-          className={`tab ${mode === 'workflow' ? 'active' : ''}`}
-          onClick={() => setMode('workflow')}
-        >
-          Full Workflow
-        </button>
-        <button
           className={`tab ${mode === 'csr-only' ? 'active' : ''}`}
           onClick={() => setMode('csr-only')}
         >
           CSR/Private Key
+        </button>
+        <button
+          className={`tab ${mode === 'workflow' ? 'active' : ''}`}
+          onClick={() => setMode('workflow')}
+        >
+          Full Keystore Workflow
         </button>
         <button
           className={`tab ${mode === 'cleanup' ? 'active' : ''}`}
