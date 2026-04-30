@@ -28,7 +28,7 @@ function App() {
     if (confirm('Start a new project? This will clear all current data.')) {
       resetProject();
       setCurrentStep(1);
-      setMode('workflow');
+      setMode('csr-only');
     }
   };
 
