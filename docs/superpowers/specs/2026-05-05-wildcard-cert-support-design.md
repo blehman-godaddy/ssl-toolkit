@@ -97,9 +97,9 @@ export function filenameSafe(domain: string): string {
 Replace every place the frontend constructs an output filename from `project.domain`:
 
 - `Step1CSRGenerator.tsx` — `keyFile` / `csrFile` strings used both for the success message and for storing paths back to the project.
-- `Step3CertificateImport.tsx` — any defaults/hints referencing `.crt` or similar.
 - `Step4KeystoreCreation.tsx` — default keystore output filename and default alias both use `filenameSafe(project.domain)`.
-- `CleanupTool.tsx` — file matching against the output directory.
+
+Step 3 and `CleanupTool` don't reference `project.domain` for filename construction (Step 3 uses an explicit file picker; Cleanup works off the output directory listing), so no changes needed there.
 
 ### 4. UI — copy tweaks
 
@@ -132,7 +132,6 @@ With `*.poli-film.net`:
 3. Step 3 accepts the issued cert and chain as normal.
 4. Step 4 produces `_.poli-film.net.p12` (and `.jks` if chosen) with alias defaulting to `_.poli-film.net`.
 5. `keytool -list -keystore _.poli-film.net.jks -storepass <pw>` lists the alias without error.
-6. `CleanupTool` lists and can delete the `_.poli-film.net.*` files.
 
 Also re-verify the non-wildcard golden path (`www.poli-film.net`) still works unchanged.
 
