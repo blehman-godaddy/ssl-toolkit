@@ -97,9 +97,9 @@ export function filenameSafe(domain: string): string {
 Replace every place the frontend constructs an output filename from `project.domain`:
 
 - `Step1CSRGenerator.tsx` — `keyFile` / `csrFile` strings used both for the success message and for storing paths back to the project.
-- `Step4KeystoreCreation.tsx` — default keystore output filename and default alias both use `filenameSafe(project.domain)`.
+- `Step4KeystoreCreation.tsx` — the success-message path `${project.outputDir}/${project.domain}.${keystoreExt}` uses `filenameSafe(project.domain)` so it matches the file Rust actually wrote.
 
-Step 3 and `CleanupTool` don't reference `project.domain` for filename construction (Step 3 uses an explicit file picker; Cleanup works off the output directory listing), so no changes needed there.
+Step 3 and `CleanupTool` don't reference `project.domain` for filename construction (Step 3 uses an explicit file picker; Cleanup works off the output directory listing), so no changes needed there. The Step 4 alias field defaults to the static string `"tomcat"` today — we leave that alone.
 
 ### 4. UI — copy tweaks
 
@@ -109,10 +109,6 @@ Step 3 and `CleanupTool` don't reference `project.domain` for filename construct
   - The success message's listed file paths use `filenameSafe(project.domain)` (via the changes in §3).
 
 No new checkboxes, badges, or mode toggles.
-
-### 5. Keystore alias default
-
-In `Step4KeystoreCreation.tsx`, the alias field defaults to `filenameSafe(project.domain)` instead of `project.domain`. The user can still override the alias freely.
 
 ## Testing
 
@@ -130,7 +126,7 @@ With `*.poli-film.net`:
 1. Step 1 generates `_.poli-film.net.key` and `_.poli-film.net.csr` in the chosen output directory.
 2. `openssl req -in _.poli-film.net.csr -noout -subject` prints `subject=... CN=*.poli-film.net`.
 3. Step 3 accepts the issued cert and chain as normal.
-4. Step 4 produces `_.poli-film.net.p12` (and `.jks` if chosen) with alias defaulting to `_.poli-film.net`.
+4. Step 4 produces `_.poli-film.net.p12` (and `.jks` if chosen) using the default `"tomcat"` alias.
 5. `keytool -list -keystore _.poli-film.net.jks -storepass <pw>` lists the alias without error.
 
 Also re-verify the non-wildcard golden path (`www.poli-film.net`) still works unchanged.
