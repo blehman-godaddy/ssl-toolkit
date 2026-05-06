@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Project } from '../types';
+import { filenameSafe } from '../utils/domain';
 
 interface Props {
   project: Project;
@@ -44,7 +45,7 @@ function Step4KeystoreCreation({ project, updateProject }: Props) {
       );
 
       if (result.success) {
-        const keystorePath = `${project.outputDir}/${project.domain}.${keystoreExt}`;
+        const keystorePath = `${project.outputDir}/${filenameSafe(project.domain)}.${keystoreExt}`;
         setKeystoreFile(keystorePath);
         setOutput(result.stdout || 'Keystore created successfully');
       } else {
