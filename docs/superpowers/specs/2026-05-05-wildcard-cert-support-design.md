@@ -76,9 +76,14 @@ Add a helper next to the validator:
 
 ```rust
 fn filename_for(domain: &str) -> String {
-    domain.replacen("*.", "_.", 1)
+    match domain.strip_prefix("*.") {
+        Some(rest) => format!("_.{}", rest),
+        None => domain.to_string(),
+    }
 }
 ```
+
+`strip_prefix` (not `replacen`) is important: we must only rewrite a *leading* `*.`. `replacen("*.", "_.", 1)` would also rewrite a non-leading `*.` like `foo.*.com` → `foo._.com`, which the validator would reject upstream but is still the wrong behavior for a filename helper.
 
 Update `generate_csr` to build `key_file` / `csr_file` paths from `filename_for(&domain)` while keeping the `-subj` argument built from the raw `domain` (so CN stays `*.example.com`).
 

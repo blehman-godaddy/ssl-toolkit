@@ -156,9 +156,14 @@ Add immediately below `is_valid_domain` in `keystore-builder-tauri/src-tauri/src
 // Derive a filesystem-friendly name from a domain. Leading `*.` becomes `_.`
 // so shells and Java tooling don't choke on the asterisk.
 fn filename_for(domain: &str) -> String {
-    domain.replacen("*.", "_.", 1)
+    match domain.strip_prefix("*.") {
+        Some(rest) => format!("_.{}", rest),
+        None => domain.to_string(),
+    }
 }
 ```
+
+Note: `strip_prefix` is used (not `replacen`) so that only a *leading* `*.` is rewritten. The `filename_for_only_rewrites_leading_star` test from Step 1 fails under `replacen("*.", "_.", 1)` because that would also rewrite a non-leading occurrence like `foo.*.com` → `foo._.com`.
 
 - [ ] **Step 4: Run the tests, verify they pass**
 
