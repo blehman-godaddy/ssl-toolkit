@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { filenameSafe } from '../utils/domain';
 
 function CSROnlyTool() {
   const [domain, setDomain] = useState('');
@@ -25,8 +26,9 @@ function CSROnlyTool() {
     setError('');
     setSuccess(false);
 
-    const keyFilePath = `${outputDir}/${domain}.key`;
-    const csrFilePath = `${outputDir}/${domain}.csr`;
+    const fileStem = filenameSafe(domain);
+    const keyFilePath = `${outputDir}/${fileStem}.key`;
+    const csrFilePath = `${outputDir}/${fileStem}.csr`;
 
     try {
       // Use the secure Tauri command
@@ -104,7 +106,7 @@ function CSROnlyTool() {
         <input
           id="domain"
           type="text"
-          placeholder="www.example.com"
+          placeholder="www.example.com or *.example.com"
           value={domain}
           onChange={(e) => setDomain(e.target.value)}
           disabled={success}
