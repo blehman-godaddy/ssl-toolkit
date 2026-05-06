@@ -47,6 +47,19 @@ fn validate_directory_path(path_str: &str) -> Result<PathBuf, String> {
     Ok(path)
 }
 
+// Validate a hostname, optionally with a single leading `*.` wildcard label.
+fn is_valid_domain(domain: &str) -> bool {
+    let host = domain.strip_prefix("*.").unwrap_or(domain);
+
+    if host.is_empty() || host.starts_with('.') || host.ends_with('.') {
+        return false;
+    }
+    if !host.contains('.') {
+        return false;
+    }
+    host.chars().all(|c| c.is_alphanumeric() || c == '.' || c == '-')
+}
+
 #[derive(Serialize, Deserialize)]
 struct CommandResult {
     success: bool,
@@ -545,4 +558,43 @@ pub fn run() {
         })
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn accepts_plain_domain() {
+        assert!(is_valid_domain("example.com"));
+        assert!(is_valid_domain("www.example.com"));
+        assert!(is_valid_domain("a-b.c-d.example.com"));
+    }
+
+    #[test]
+    fn accepts_leading_wildcard() {
+        assert!(is_valid_domain("*.example.com"));
+        assert!(is_valid_domain("*.foo.example.com"));
+    }
+
+    #[test]
+    fn rejects_bad_wildcards() {
+        assert!(!is_valid_domain("*"));
+        assert!(!is_valid_domain("*."));
+        assert!(!is_valid_domain("*foo.com"));
+        assert!(!is_valid_domain("foo.*.com"));
+        assert!(!is_valid_domain("**.com"));
+    }
+
+    #[test]
+    fn rejects_malformed() {
+        assert!(!is_valid_domain(""));
+        assert!(!is_valid_domain("localhost"));
+        assert!(!is_valid_domain("*.localhost"));
+        assert!(!is_valid_domain(".example.com"));
+        assert!(!is_valid_domain("example.com."));
+        assert!(!is_valid_domain("..com"));
+        assert!(!is_valid_domain("foo bar.com"));
+        assert!(!is_valid_domain("foo/bar.com"));
+    }
 }
