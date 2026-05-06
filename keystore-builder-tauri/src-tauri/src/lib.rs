@@ -60,6 +60,15 @@ fn is_valid_domain(domain: &str) -> bool {
     host.chars().all(|c| c.is_alphanumeric() || c == '.' || c == '-')
 }
 
+// Derive a filesystem-friendly name from a domain. Leading `*.` becomes `_.`
+// so shells and Java tooling don't choke on the asterisk.
+fn filename_for(domain: &str) -> String {
+    match domain.strip_prefix("*.") {
+        Some(rest) => format!("_.{}", rest),
+        None => domain.to_string(),
+    }
+}
+
 #[derive(Serialize, Deserialize)]
 struct CommandResult {
     success: bool,
@@ -596,5 +605,24 @@ mod tests {
         assert!(!is_valid_domain("..com"));
         assert!(!is_valid_domain("foo bar.com"));
         assert!(!is_valid_domain("foo/bar.com"));
+    }
+
+    #[test]
+    fn filename_for_plain_domain_unchanged() {
+        assert_eq!(filename_for("example.com"), "example.com");
+        assert_eq!(filename_for("www.example.com"), "www.example.com");
+    }
+
+    #[test]
+    fn filename_for_wildcard_rewrites_leading_star() {
+        assert_eq!(filename_for("*.example.com"), "_.example.com");
+        assert_eq!(filename_for("*.foo.example.com"), "_.foo.example.com");
+    }
+
+    #[test]
+    fn filename_for_only_rewrites_leading_star() {
+        // Defense-in-depth: non-leading `*` is rejected by validator, but
+        // the transform itself must never touch anything past the first label.
+        assert_eq!(filename_for("foo.*.com"), "foo.*.com");
     }
 }
