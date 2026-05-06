@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Project } from '../types';
+import { filenameSafe } from '../utils/domain';
 
 interface Props {
   project: Project;
@@ -28,8 +29,9 @@ function Step1CSRGenerator({ project, updateProject, goToNextStep }: Props) {
     setError('');
     setSuccess(false);
 
-    const keyFile = `${project.outputDir}/${project.domain}.key`;
-    const csrFile = `${project.outputDir}/${project.domain}.csr`;
+    const fileStem = filenameSafe(project.domain);
+    const keyFile = `${project.outputDir}/${fileStem}.key`;
+    const csrFile = `${project.outputDir}/${fileStem}.csr`;
 
     try {
       // Use the secure Tauri command
@@ -85,7 +87,7 @@ function Step1CSRGenerator({ project, updateProject, goToNextStep }: Props) {
         <input
           id="domain"
           type="text"
-          placeholder="www.example.com"
+          placeholder="www.example.com or *.example.com"
           value={project.domain}
           onChange={(e) => updateProject({ domain: e.target.value })}
           disabled={success}
