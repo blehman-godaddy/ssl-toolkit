@@ -2,6 +2,8 @@
 
 Desktop app for generating CSRs, importing issued certificates, and building keystores for GoDaddy SSL workflows. Built with Tauri (Rust + React), so the heavy lifting happens in a small native binary and no shell commands are ever string-concatenated.
 
+![GoDaddy SSL Toolkit — CSR & Private Key Generator](screenshot.png)
+
 ## What it does
 
 Three modes, accessed from tabs in the app:
