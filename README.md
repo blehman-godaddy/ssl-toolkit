@@ -14,12 +14,7 @@ Wildcard certificates (`*.example.com`) are supported throughout. Filenames are 
 
 ## Layout
 
-```
-keystore-builder-tauri/   # the Tauri app (Rust + React/TS)
-docs/superpowers/         # design specs and implementation plans
-```
-
-The app source lives under `keystore-builder-tauri/`; everything else in this repo is documentation.
+The app lives under `keystore-builder-tauri/` (Rust + React/TS). That's it — the rest of the repo is just this README.
 
 ## Running locally
 
