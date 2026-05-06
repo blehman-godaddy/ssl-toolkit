@@ -119,18 +119,18 @@ fn execute_command(args: Vec<String>) -> CommandResult {
 // Generate CSR with secure parameters
 #[tauri::command]
 fn generate_csr(domain: String, output_dir: String) -> CommandResult {
-    // Validate domain (basic validation)
-    if !domain.chars().all(|c| c.is_alphanumeric() || c == '.' || c == '-') {
+    if !is_valid_domain(&domain) {
         return CommandResult {
             success: false,
             stdout: None,
             stderr: None,
-            error: Some("Invalid domain name".to_string()),
+            error: Some("Invalid domain. Use example.com or *.example.com".to_string()),
         };
     }
 
-    let key_file = format!("{}/{}.key", output_dir, domain);
-    let csr_file = format!("{}/{}.csr", output_dir, domain);
+    let file_stem = filename_for(&domain);
+    let key_file = format!("{}/{}.key", output_dir, file_stem);
+    let csr_file = format!("{}/{}.csr", output_dir, file_stem);
     let subject = format!("/C=US/ST=Arizona/L=Tempe/O={}/OU=IT/CN={}", domain, domain);
 
     match Command::new("openssl")
