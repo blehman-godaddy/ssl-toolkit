@@ -410,11 +410,17 @@ fn create_keystore(
 
 #[tauri::command]
 fn file_exists(file_path: String) -> bool {
-    // Validate path before checking existence
-    match validate_path(&file_path) {
-        Ok(path) => path.exists(),
-        Err(_) => false,
+    // Basic safety checks only — don't canonicalize, because that fails for
+    // files that don't exist yet (defeating the purpose of an existence check)
+    // and races with filesystem caches immediately after a write.
+    if file_path.contains("..") {
+        return false;
     }
+    let path = PathBuf::from(&file_path);
+    if !path.is_absolute() {
+        return false;
+    }
+    path.exists()
 }
 
 #[tauri::command]
