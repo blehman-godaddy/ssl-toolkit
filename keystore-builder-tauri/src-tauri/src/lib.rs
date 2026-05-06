@@ -190,7 +190,8 @@ fn create_keystore(
         }
     };
 
-    let keystore_file = format!("{}/{}.{}", output_dir, domain, extension);
+    let file_stem = filename_for(&domain);
+    let keystore_file = format!("{}/{}.{}", output_dir, file_stem, extension);
     let temp_p12 = format!("{}/temp.p12", output_dir);
 
     let mut all_output = String::new();
