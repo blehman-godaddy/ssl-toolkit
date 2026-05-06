@@ -99,12 +99,13 @@ export function filenameSafe(domain: string): string {
 }
 ```
 
-Replace every place the frontend constructs an output filename from `project.domain`:
+Replace every place the frontend constructs an output filename from a domain:
 
 - `Step1CSRGenerator.tsx` — `keyFile` / `csrFile` strings used both for the success message and for storing paths back to the project.
+- `CSROnlyTool.tsx` — the standalone "CSR / Private Key" tab. Has its own local `domain` state (not tied to the wizard's `project`), and builds `keyFilePath` / `csrFilePath` from it the same way Step 1 does. Must apply `filenameSafe` for the same reason.
 - `Step4KeystoreCreation.tsx` — the success-message path `${project.outputDir}/${project.domain}.${keystoreExt}` uses `filenameSafe(project.domain)` so it matches the file Rust actually wrote.
 
-Step 3 and `CleanupTool` don't reference `project.domain` for filename construction (Step 3 uses an explicit file picker; Cleanup works off the output directory listing), so no changes needed there. The Step 4 alias field defaults to the static string `"tomcat"` today — we leave that alone.
+Step 3 and `CleanupTool` don't reference any domain for filename construction (Step 3 uses an explicit file picker; Cleanup works off the output directory listing), so no changes needed there. The Step 4 alias field defaults to the static string `"tomcat"` today — we leave that alone.
 
 ### 4. UI — copy tweaks
 
